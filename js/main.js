@@ -19,12 +19,12 @@ $(document).ready(function() {
 				label: 'Toner Lite',				// optional label used for tooltip
 				iconURL: 'img/tonerGray.png'
 			}),
-			L.tileLayer('//{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', {
+			L.tileLayer('https://stamen-tiles-{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', {
 				label: 'Toner',
 				iconURL: 'img/tonerBlack.png'
 			}),
-			L.tileLayer('//{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png', {
-				attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+			L.tileLayer('https://stamen-tiles-{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png', {
+				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 				label: 'Watercolor',
 				iconURL: 'img/watercolor.jpg'
 			})
