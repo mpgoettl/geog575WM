@@ -50,124 +50,159 @@ $(document).ready(function() {
 		$.getJSON("data/map.json",(function(data) {
 			var info = processData(data);
 			createPropSymbols(info.timestamps, data);
+			createSliderUI(info.timestamps);
 			
-				function processData(data) {
-					var timestamps = [];
-					var min = Infinity;
-					var max = -Infinity;
+		function processData(data) {
+			var timestamps = [];
+			var min = Infinity;
+			var max = -Infinity;
+			
+			for (var feature in data.features) {
+				
+				var properties = data.features[feature].properties;
+				
+				for (var attribute in properties) {
 					
-					for (var feature in data.features) {
-						
-						var properties = data.features[feature].properties;
-						
-						for (var attribute in properties) {
-							
-							if (attribute != "id" &&
-								attribute != "name" &&
-								attribute != "lat" &&
-								attribute != "lon" ) {
-										
-									if ( $.inArray(attribute,timestamps) === -1) {
-										timestamps.push(attribute);
-									}
-									
-									if (properties[attribute] < min) {
-										min = properties[attribute];
-									}
-									
-									if (properties[attribute] > max) {
-										max = properties[attribute];
-									}
+					if (attribute != "id" &&
+						attribute != "name" &&
+						attribute != "lat" &&
+						attribute != "lon" ) {
+								
+							if ( $.inArray(attribute,timestamps) === -1) {
+								timestamps.push(attribute);
 							}
-						}
-					}
-					
-					return {
-						timestamps : timestamps,
-						min : min,
-						max : max
+							
+							if (properties[attribute] < min) {
+								min = properties[attribute];
+							}
+							
+							if (properties[attribute] > max) {
+								max = properties[attribute];
+							}
 					}
 				}
-				function createPropSymbols(timestamps, data) {
+			}
 			
-						cities = L.geoJson(data, {
-						
-								pointToLayer: function(feature, latlng) {
+			return {
+				timestamps : timestamps,
+				min : min,
+				max : max
+			}
+		}
+		function createPropSymbols(timestamps, data) {
+	
+				cities = L.geoJson(data, {
+				
+						pointToLayer: function(feature, latlng) {
+							
+						return L.circleMarker(latlng, {
+								fillColor: "yellow",
+								color: "black",
+								weight: 1, 
+								fillOpacity: 0.6 
+							   }).on({
+								   
+								   mouseover: function(e) {
+											this.openPopup();
+											this.setStyle({color: "yellow"});
+									},
+								   mouseout: function(e) {
+											this.closePopup();
+											this.setStyle({color: "black"});
+									}
 									
-								return L.circleMarker(latlng, {
-										fillColor: "yellow",
-										color: "black",
-										weight: 1, 
-										fillOpacity: 0.6 
-									   }).on({
-										   
-										   mouseover: function(e) {
-													this.openPopup();
-													this.setStyle({color: "yellow"});
-											},
-										   mouseout: function(e) {
-													this.closePopup();
-													this.setStyle({color: "black"});
-							
-											}
-										});
-								}
-						}).addTo(map);
-
-						updatePropSymbols(timestamps[0]);
-							function updatePropSymbols(timestamp) {
-		
-								cities.eachLayer(function(layer) {
-							
-									var props = layer.feature.properties;
-									var radius = calcPropRadius(props[timestamp]);
-									var popupContent = "<b>" + "Particulate Matter" + "</b><br><br>" + props.name + "<i>" + "</i>" + "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp;
-
-									layer.setRadius(radius);
-									layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
 								});
-							}
-							function calcPropRadius(attributeValue) {
+						}
+				}).addTo(map);
 
-								var scaleFactor = 20;
-								var area = attributeValue * scaleFactor;
-								return Math.sqrt(area/Math.PI)*2;			
-							}
-				}
-		function createLegend(map, attributes){
-			var LegendControl = L.Control.extend({
-				options: {
-					position: 'bottomright'
-				},
+				updatePropSymbols(timestamps[0]);
+		}
+		function updatePropSymbols(timestamp) {
 
-				onAdd: function (map) {
-					// create the control container with a particular class name
-					var container = L.DomUtil.create('div', 'legend-control-container');
+			cities.eachLayer(function(layer) {
+		
+				var props = layer.feature.properties;
+				var radius = calcPropRadius(props[timestamp]);
+				var popupContent = "<b>" + "Particulate Matter" + "</b><br><br>" + props.name + "<i>" + "</i>" + "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp;
 
-					//add temporal legend div to container
-					$(container).append('<div id="temporal-legend">')
-
-					//Step 1: start attribute legend svg string
-					var svg = '<svg id="attribute-legend" width="180px" height="180px">';
-
-					//add attribute legend svg to container
-					$(container).append(svg);
-
-					return container;
-				}
+				layer.setRadius(radius);
+				layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
 			});
+		}
+		function calcPropRadius(attributeValue) {
 
-			map.addControl(new LegendControl());
+			var scaleFactor = 30;
+			var area = attributeValue * scaleFactor;
+			return Math.sqrt(area/Math.PI)*1;			
+		}
+		
+		function createSliderUI(timestamps) {
 
-			updateLegend(map, attributes[0]);
-		};  
+			var sliderControl = L.control({ position: "bottomleft"} );
+
+			sliderControl.onAdd = function(map) {
+
+				 var slider = L.DomUtil.create("input", "range-slider");
+
+				 L.DomEvent.addListener(slider, "mousedown", function(e) {
+				 L.DomEvent.stopPropagation(e);
+				 });
+
+				 $(slider)
+						.attr({"type":"range",
+							"max": timestamps[timestamps.length-1],
+							"min": timestamps[0],
+							"step": 1})
+						.on("input change", function() {
+						updatePropSymbols($(this).val().toString());
+				});
+				return slider;
+			}
+
+			sliderControl.addTo(map)
+		}
+		
+		
+
 
 		
-				
-				
 		}));
-			
-});
+	});
+				
+				
+				/*function createLegend(map, attributes){
+					var LegendControl = L.Control.extend({
+						options: {
+							position: 'bottomright'
+						},
+
+						onAdd: function (map) {
+							// create the control container with a particular class name
+							var container = L.DomUtil.create('div', 'legend-control-container');
+
+							//add temporal legend div to container
+							$(container).append('<div id="temporal-legend">')
+
+							//Step 1: start attribute legend svg string
+							var svg = '<svg id="attribute-legend" width="180px" height="180px">';
+
+							//add attribute legend svg to container
+							$(container).append(svg);
+
+							return container;
+						}
+					});
+
+					map.addControl(new LegendControl());
+
+					updateLegend(map, attributes[0]);
+				}; 
+				
+		
+		
+
+	
+
 	
 
 
@@ -177,5 +212,5 @@ $(document).ready(function() {
 
 
 
-    
+    */
   
