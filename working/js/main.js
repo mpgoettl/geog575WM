@@ -40,20 +40,16 @@ $(document).ready(function() {
 		
 		var popup = L.popup();
 	
-				function onMapClick(e) {
-					popup
-						.setLatLng(e.latlng)
-						.setContent("This specific location on the map is " + e.latlng.toString())
-						.openOn(map);
-				}
-			map.on('click', onMapClick);
-			
-		$.getJSON("data/map.json",(function(data) {
-			var info = processData(data);
-			createPropSymbols(info.timestamps, data);
-			createLegend(info.min, info.max);
-			createSliderUI(info.timestamps);
-			
+		
+		$.getJSON("data/map.json")
+			.done(function(data) { //
+				var info = processData(data);
+				createPropSymbols(info.timestamps, data);
+				createLegend(info.min, info.max);
+				createSliderUI(info.timestamps);
+			})
+		.fail(function() { alert("There has been a problem loading the data")});
+		
 		function processData(data) {
 			var timestamps = [];
 			var min = Infinity;
@@ -133,15 +129,10 @@ $(document).ready(function() {
 		}
 		function calcPropRadius(attributeValue) {
 
-			var scaleFactor = 16;
+			var scaleFactor = 30;
 			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI)*2;			
+			return Math.sqrt(area/Math.PI)*3;			
 		}
-		
-		
-		
-		
-		
 		
 		function createLegend(min, max) {
 
@@ -202,11 +193,10 @@ $(document).ready(function() {
 
 		} // end createLegend()
 		
-		
-		
-		
+			
+				
 		function createSliderUI(timestamps) {
-
+			
 			var sliderControl = L.control({ position: "bottomleft"});
 			
 			
@@ -219,27 +209,28 @@ $(document).ready(function() {
 			L.DomEvent.stopPropagation(e);
 			
 			});
-			 
-			
-
-			$(slider)
-					.attr({
-						"type":"range",
-						"max": timestamps[timestamps.length-1],
-						"min": timestamps[0],
-						"step": 11,
-						"value": String(timestamps[0])})
-					.on("input change", function() {
-						updatePropSymbols($(this).val().toString());
-						var i = $.inArray(this.value,timestamps);
-						$(".temporal-legend").text(this[i].value);
-			});
-			
-			return slider;
+				
+				 
+				$(slider)
+						.attr({
+							"type":"range",
+							"max": timestamps[timestamps.length-1],
+							"min": timestamps[0],
+							"step": 11,
+							"value": String(timestamps[0])})
+						.on("input change", function() {
+							updatePropSymbols($(this).val().toString());
+							var i = $.inArray(this.value,timestamps);
+							$(".temporal-legend").text(this[i].value);
+				});
+				
+				return slider;
 			}
-
+				
+				
+				
 			sliderControl.addTo(map)
-			createTemporalLegend(timestamps[0]);
+			createTemporalLegend(timestamps[0])
 			
 		}
 		
@@ -256,14 +247,25 @@ $(document).ready(function() {
 			temporalLegend.addTo(map);
 		}
 
-
 		
-		}));
 	});
 				
 				
 		
+	/*function createSliderUI(map){
+			
+			//create range input element (slider)
+			$('#map').append('<input class="range-slider" type="range" >');
 		
+		
+		//set slider attributes
+			$('.range-slider').attr({
+				max: 6,
+				min: 0,
+				value: 0,
+				step: 1
+			});
+		}*/	
 
 	
 

@@ -17,7 +17,7 @@ margin: 20px auto;
 
 .range-slider {
     width: 250%;
-	
+	display: inline-block;
 	
 }
 
