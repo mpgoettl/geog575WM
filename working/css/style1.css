@@ -1,19 +1,25 @@
 /* Stylesheet by Martin P. Goettl, 2021 */
 
-html, body, #map{
-    height: 100%;
-	margin: 0;
-	padding: 0;
-}
- #map {
-    height: 100%;
+html, body, #map {
     width: 100%;
-    display: inline-block;
+    height: 100%;
+	margin: 15px auto;
+}
+#map{
+    width: 95%; 
+    height: 95%;
+margin: 20px auto;	
+
+      
 }
 
 
 
-
+.range-slider {
+    width: 250%;
+	
+	
+}
 
 .leaflet-popup-content {
 	background: gray;
@@ -44,7 +50,7 @@ html, body, #map{
 }
 .legendCircle {
 	border-radius:50%; 
-	border: 1px solid #537898; 
+	border: 1px solid #537898;
 	background: rgba(113, 133, 152, .6);
 	display: inline-block;
 }

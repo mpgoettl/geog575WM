@@ -10,6 +10,7 @@ $(document).ready(function() {
 		zoom: 4,  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
 		scrollWheelZoom: true,
 		tap: false
+		
 				
 		});
 		
@@ -50,6 +51,7 @@ $(document).ready(function() {
 		$.getJSON("data/map.json",(function(data) {
 			var info = processData(data);
 			createPropSymbols(info.timestamps, data);
+			createLegend(info.min, info.max);
 			createSliderUI(info.timestamps);
 			
 		function processData(data) {
@@ -131,38 +133,128 @@ $(document).ready(function() {
 		}
 		function calcPropRadius(attributeValue) {
 
-			var scaleFactor = 30;
+			var scaleFactor = 16;
 			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI)*1;			
+			return Math.sqrt(area/Math.PI)*2;			
 		}
+		
+		
+		
+		
+		
+		
+		function createLegend(min, max) {
+
+			if (min < 10) {
+				min = 10;
+			}
+
+			function roundNumber(inNumber) {
+
+						return (Math.round(inNumber/10) * 10);
+			}
+
+			var legend = L.control( { position: "bottomright" } );
+
+			legend.onAdd = function(map) {
+
+			var legendContainer = L.DomUtil.create("div", "legend");
+			var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
+			var classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)];
+			var legendCircle;
+			var lastRadius = 0;
+			var currentRadius;
+			var margin;
+
+			L.DomEvent.addListener(legendContainer, "mousedown", function(e) {
+				L.DomEvent.stopPropagation(e);
+			});
+
+			$(legendContainer).append("<h2 id='legendTitle'> PM 2.5</h2>");
+
+			
+			for (var i = 0; i <= classes.length-1; i++) {
+
+				legendCircle = L.DomUtil.create("div", "legendCircle");
+
+				currentRadius = calcPropRadius(classes[i]);
+
+				margin = -currentRadius - lastRadius - 2;
+
+				$(legendCircle).attr("style", "width: " + currentRadius*2 +
+					"px; height: " + currentRadius*2 +
+					"px; margin-left: " + margin + "px" );
+				$(legendCircle).append("<span class='legendValue'>"+classes[i]+"</span>");
+
+				$(symbolsContainer).append(legendCircle);
+
+				lastRadius = currentRadius;
+
+			}
+		
+			$(legendContainer).append(symbolsContainer);
+
+			return legendContainer;
+
+			};
+
+			legend.addTo(map);
+
+		} // end createLegend()
+		
+		
+		
 		
 		function createSliderUI(timestamps) {
 
-			var sliderControl = L.control({ position: "bottomleft"} );
-
+			var sliderControl = L.control({ position: "bottomleft"});
+			
+			
 			sliderControl.onAdd = function(map) {
+			
+			var slider = L.DomUtil.create("input", "range-slider");
 
-				 var slider = L.DomUtil.create("input", "range-slider");
+			 
+			L.DomEvent.addListener(slider, "mousedown", function(e) {
+			L.DomEvent.stopPropagation(e);
+			
+			});
+			 
+			
 
-				 L.DomEvent.addListener(slider, "mousedown", function(e) {
-				 L.DomEvent.stopPropagation(e);
-				 });
-
-				 $(slider)
-						.attr({"type":"range",
-							"max": timestamps[timestamps.length-1],
-							"min": timestamps[0],
-							"step": 1})
-						.on("input change", function() {
+			$(slider)
+					.attr({
+						"type":"range",
+						"max": timestamps[timestamps.length-1],
+						"min": timestamps[0],
+						"step": 11,
+						"value": String(timestamps[0])})
+					.on("input change", function() {
 						updatePropSymbols($(this).val().toString());
-				});
-				return slider;
+						var i = $.inArray(this.value,timestamps);
+						$(".temporal-legend").text(this[i].value);
+			});
+			
+			return slider;
 			}
 
 			sliderControl.addTo(map)
+			createTemporalLegend(timestamps[0]);
+			
 		}
 		
-		
+		function createTemporalLegend(startTimestamp) {
+
+			var temporalLegend = L.control({ position: "bottomleft" });
+
+			temporalLegend.onAdd = function(map) {
+					var output = L.DomUtil.create("output", "temporal-legend");
+					$(output).text(startTimestamp)
+					return output;
+			}
+
+			temporalLegend.addTo(map);
+		}
 
 
 		
@@ -170,34 +262,6 @@ $(document).ready(function() {
 	});
 				
 				
-				/*function createLegend(map, attributes){
-					var LegendControl = L.Control.extend({
-						options: {
-							position: 'bottomright'
-						},
-
-						onAdd: function (map) {
-							// create the control container with a particular class name
-							var container = L.DomUtil.create('div', 'legend-control-container');
-
-							//add temporal legend div to container
-							$(container).append('<div id="temporal-legend">')
-
-							//Step 1: start attribute legend svg string
-							var svg = '<svg id="attribute-legend" width="180px" height="180px">';
-
-							//add attribute legend svg to container
-							$(container).append(svg);
-
-							return container;
-						}
-					});
-
-					map.addControl(new LegendControl());
-
-					updateLegend(map, attributes[0]);
-				}; 
-				
 		
 		
 
@@ -212,5 +276,5 @@ $(document).ready(function() {
 
 
 
-    */
+  
   

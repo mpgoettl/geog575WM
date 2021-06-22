@@ -10,7 +10,6 @@ $(document).ready(function() {
 		zoom: 4,  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
 		scrollWheelZoom: true,
 		tap: false
-		
 				
 		});
 		
@@ -133,9 +132,9 @@ $(document).ready(function() {
 		}
 		function calcPropRadius(attributeValue) {
 
-			var scaleFactor = 16;
+			var scaleFactor = 30;
 			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI)*2;			
+			return Math.sqrt(area/Math.PI)*1;			
 		}
 		
 		
@@ -207,40 +206,31 @@ $(document).ready(function() {
 		
 		function createSliderUI(timestamps) {
 
-			var sliderControl = L.control({ position: "bottomleft"});
-			
-			
+			var sliderControl = L.control({ position: "bottomleft"} );
+
 			sliderControl.onAdd = function(map) {
-			
-			var slider = L.DomUtil.create("input", "range-slider");
 
-			 
-			L.DomEvent.addListener(slider, "mousedown", function(e) {
-			L.DomEvent.stopPropagation(e);
-			
-			});
-			 
-			
+				 var slider = L.DomUtil.create("input", "range-slider");
 
-			$(slider)
-					.attr({
-						"type":"range",
-						"max": timestamps[timestamps.length-1],
-						"min": timestamps[0],
-						"step": 11,
-						"value": String(timestamps[0])})
-					.on("input change", function() {
+				 L.DomEvent.addListener(slider, "mousedown", function(e) {
+				 L.DomEvent.stopPropagation(e);
+				 });
+
+				 $(slider)
+						.attr({"type":"range",
+							"max": timestamps[timestamps.length-1],
+							"min": timestamps[0],
+							"step": 1,
+							"value": String(timestamps[0])})
+						.on("input change", function() {
 						updatePropSymbols($(this).val().toString());
-						var i = $.inArray(this.value,timestamps);
-						$(".temporal-legend").text(this[i].value);
-			});
-			
-			return slider;
+							$(".temporal-legend").text(this.value);
+				});
+				return slider;
 			}
 
 			sliderControl.addTo(map)
 			createTemporalLegend(timestamps[0]);
-			
 		}
 		
 		function createTemporalLegend(startTimestamp) {
@@ -260,6 +250,7 @@ $(document).ready(function() {
 		
 		}));
 	});
+				
 				
 				
 		
