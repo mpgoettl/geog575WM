@@ -131,7 +131,7 @@ $(document).ready(function() {
 
 			var scaleFactor = 30;
 			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI)*3;			
+			return Math.sqrt(area/Math.PI)*2;			
 		}
 		
 		function createLegend(min, max) {
@@ -142,7 +142,7 @@ $(document).ready(function() {
 
 			function roundNumber(inNumber) {
 
-						return (Math.round(inNumber/10) * 10);
+						return (Math.round(inNumber/2) * 2);
 			}
 
 			var legend = L.control( { position: "bottomright" } );
@@ -157,11 +157,12 @@ $(document).ready(function() {
 			var currentRadius;
 			var margin;
 
-			L.DomEvent.addListener(legendContainer, "mousedown", function(e) {
+						
+			L.DomEvent.addListener(legendContainer, 'mousedown', function(e) {
 				L.DomEvent.stopPropagation(e);
 			});
 
-			$(legendContainer).append("<h2 id='legendTitle'> PM 2.5</h2>");
+			$(legendContainer).append("<h2 id='legendTitle'> Particulate <br> Matter in <br> the Air</h2>");
 
 			
 			for (var i = 0; i <= classes.length-1; i++) {
@@ -196,7 +197,7 @@ $(document).ready(function() {
 			
 				
 		function createSliderUI(timestamps) {
-			
+
 			var sliderControl = L.control({ position: "bottomleft"});
 			
 			
@@ -209,30 +210,29 @@ $(document).ready(function() {
 			L.DomEvent.stopPropagation(e);
 			
 			});
-				
-				 
-				$(slider)
-						.attr({
-							"type":"range",
-							"max": timestamps[timestamps.length-1],
-							"min": timestamps[0],
-							"step": 11,
-							"value": String(timestamps[0])})
-						.on("input change", function() {
-							updatePropSymbols($(this).val().toString());
-							var i = $.inArray(this.value,timestamps);
-							$(".temporal-legend").text(this[i].value);
-				});
-				
-				return slider;
+			 
+			
+
+			$(slider)
+					.attr({
+						"type":"range",
+						"max": timestamps[timestamps.length-1],
+						"min": timestamps[0],
+						"step": 11,
+						"value": String(timestamps[0])})
+					.on("input change", function() {
+					updatePropSymbols($(this).val().toString());
+						$(".temporal-legend").text(this[i].value);
+			});
+			
+			return slider;
 			}
-				
-				
-				
+
 			sliderControl.addTo(map)
-			createTemporalLegend(timestamps[0])
+			createTemporalLegend(timestamps[0]);
 			
 		}
+		
 		
 		function createTemporalLegend(startTimestamp) {
 
