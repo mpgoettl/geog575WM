@@ -2,23 +2,18 @@
 
 $(document).ready(function() {
 		
-		//var mapCenter = [41, -94];
+		var mapCenter = [41, -94];
 		var cities;
 		var map = L.map('map', {
 		defaultExtentControl: true,
-		center: [41, -94],// mapCenter, // EDIT latitude, longitude to re-center map [39.34, -99.85],
-		zoom: 4  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
-		//scrollWheelZoom: true,
-		//tap: false
+		center: mapCenter, // EDIT latitude, longitude to re-center map [39.34, -99.85],
+		zoom: 4,  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
+		scrollWheelZoom: true,
+		tap: false
+				
+		});
 		
-		});		
-		
-		
-		L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
-			attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(map);				// optional label used for tooltip}).addTo(map);
-		
-		
-		/*var basemaps = [
+		var basemaps = [
 			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
 				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 				label: 'Toner Lite',				// optional label used for tooltip
@@ -40,12 +35,19 @@ $(document).ready(function() {
 			position: "topright",
 			basemaps: basemaps,
 			
-		}));*/
+		}));
 		
-		//var popup = L.popup();
+		var popup = L.popup();
 	
-		
-		$.getJSON("data/mapReal.json",(function(data) {
+				function onMapClick(e) {
+					popup
+						.setLatLng(e.latlng)
+						.setContent("This specific location on the map is " + e.latlng.toString())
+						.openOn(map);
+				}
+			map.on('click', onMapClick);
+			
+		$.getJSON("data/map.json",(function(data) {
 			var info = processData(data);
 			createPropSymbols(info.timestamps, data);
 			createLegend(info.min, info.max);
@@ -132,7 +134,7 @@ $(document).ready(function() {
 
 			var scaleFactor = 30;
 			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI)*2;			
+			return Math.sqrt(area/Math.PI)*1;			
 		}
 		
 		
@@ -148,7 +150,7 @@ $(document).ready(function() {
 
 			function roundNumber(inNumber) {
 
-						return (Math.round(inNumber/2) * 2);
+						return (Math.round(inNumber/10) * 10);
 			}
 
 			var legend = L.control( { position: "bottomright" } );
@@ -167,7 +169,7 @@ $(document).ready(function() {
 				L.DomEvent.stopPropagation(e);
 			});
 
-			$(legendContainer).append("<h2 id='legendTitle'> Particulate <br> Matter <br> in the Air</h2>");
+			$(legendContainer).append("<h2 id='legendTitle'> PM 2.5</h2>");
 
 			
 			for (var i = 0; i <= classes.length-1; i++) {
@@ -204,41 +206,31 @@ $(document).ready(function() {
 		
 		function createSliderUI(timestamps) {
 
-			var sliderControl = L.control({ position: "bottomleft"});
-			
-			
+			var sliderControl = L.control({ position: "bottomleft"} );
+
 			sliderControl.onAdd = function(map) {
-			
-			var slider = L.DomUtil.create("input", "range-slider");
 
-			 
-			L.DomEvent.addListener(slider, "mousedown", function(e) {
-			L.DomEvent.stopPropagation(e);
-			
-			});
-			 
-			
+				 var slider = L.DomUtil.create("input", "range-slider");
 
-			$(slider)
-					.attr({
-						"type":"range",
-						"max": timestamps[timestamps.length-1],
-						"min": timestamps[0],
-						"step": 21,
-						"value": String(timestamps[0])})
-					.on("input change", function() {
+				 L.DomEvent.addListener(slider, "mousedown", function(e) {
+				 L.DomEvent.stopPropagation(e);
+				 });
+
+				 $(slider)
+						.attr({"type":"range",
+							"max": timestamps[timestamps.length-1],
+							"min": timestamps[0],
+							"step": 1,
+							"value": String(timestamps[0])})
+						.on("input change", function() {
 						updatePropSymbols($(this).val().toString());
-						var i = $.inArray(this.value,timestamps);
-						$(".temporal-legend").text(this[i].value);
-			});
-			
-			return slider;
+							$(".temporal-legend").text(this.value);
+				});
+				return slider;
 			}
 
 			sliderControl.addTo(map)
 			createTemporalLegend(timestamps[0]);
-			
-			
 		}
 		
 		function createTemporalLegend(startTimestamp) {
@@ -258,11 +250,12 @@ $(document).ready(function() {
 		
 		}));
 	});
-	
+				
 				
 				
 		
-	
+		
+
 	
 
 	

@@ -2,23 +2,19 @@
 
 $(document).ready(function() {
 		
-		//var mapCenter = [41, -94];
+		var mapCenter = [41, -94];
 		var cities;
 		var map = L.map('map', {
 		defaultExtentControl: true,
-		center: [41, -94],// mapCenter, // EDIT latitude, longitude to re-center map [39.34, -99.85],
-		zoom: 4  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
-		//scrollWheelZoom: true,
-		//tap: false
+		center: mapCenter, // EDIT latitude, longitude to re-center map [39.34, -99.85],
+		zoom: 4,  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
+		scrollWheelZoom: true,
+		tap: false
 		
-		});		
+				
+		});
 		
-		
-		L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
-			attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(map);				// optional label used for tooltip}).addTo(map);
-		
-		
-		/*var basemaps = [
+		var basemaps = [
 			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
 				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 				label: 'Toner Lite',				// optional label used for tooltip
@@ -40,12 +36,12 @@ $(document).ready(function() {
 			position: "topright",
 			basemaps: basemaps,
 			
-		}));*/
+		}));
 		
-		//var popup = L.popup();
+		var popup = L.popup();
 	
 		
-		$.getJSON("data/mapReal.json",(function(data) {
+		$.getJSON("data/map.json",(function(data) {  //"https://raw.githubusercontent.com/neiugis/lab7_map/main/city.geojson"
 			var info = processData(data);
 			createPropSymbols(info.timestamps, data);
 			createLegend(info.min, info.max);
@@ -53,8 +49,8 @@ $(document).ready(function() {
 			
 		function processData(data) {
 			var timestamps = [];
-			var min = Infinity;
-			var max = -Infinity;
+			var min = 0; //Infinity;
+			var max = 20; //Infinity;
 			
 			for (var feature in data.features) {
 				
@@ -64,6 +60,8 @@ $(document).ready(function() {
 					
 					if (attribute != "id" &&
 						attribute != "name" &&
+						attribute != "pollution" &&
+						attribute != "trend" &&
 						attribute != "lat" &&
 						attribute != "lon" ) {
 								
@@ -117,13 +115,13 @@ $(document).ready(function() {
 				updatePropSymbols(timestamps[0]);
 		}
 		function updatePropSymbols(timestamp) {
-
+			
 			cities.eachLayer(function(layer) {
 		
 				var props = layer.feature.properties;
 				var radius = calcPropRadius(props[timestamp]);
 				var popupContent = "<b>" + "Particulate Matter" + "</b><br><br>" + props.name + "<i>" + "</i>" + "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp;
-
+				
 				layer.setRadius(radius);
 				layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
 			});
@@ -132,7 +130,7 @@ $(document).ready(function() {
 
 			var scaleFactor = 30;
 			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI)*2;			
+			return Math.sqrt(area/Math.PI)*3;			
 		}
 		
 		
@@ -210,7 +208,8 @@ $(document).ready(function() {
 			sliderControl.onAdd = function(map) {
 			
 			var slider = L.DomUtil.create("input", "range-slider");
-
+			
+			
 			 
 			L.DomEvent.addListener(slider, "mousedown", function(e) {
 			L.DomEvent.stopPropagation(e);
@@ -218,15 +217,24 @@ $(document).ready(function() {
 			});
 			 
 			
-
+			
+			
+			
+			console.log(timestamps[timestamps.length-1]);
+			console.log(timestamps[0]);
+			console.log(String(timestamps[0]));
+			
+		
+			
 			$(slider)
 					.attr({
 						"type":"range",
 						"max": timestamps[timestamps.length-1],
 						"min": timestamps[0],
-						"step": 21,
+						"step": 5,
 						"value": String(timestamps[0])})
-					.on("input change", function() {
+					.on("input", function() {
+						
 						updatePropSymbols($(this).val().toString());
 						var i = $.inArray(this.value,timestamps);
 						$(".temporal-legend").text(this[i].value);
@@ -242,16 +250,20 @@ $(document).ready(function() {
 		}
 		
 		function createTemporalLegend(startTimestamp) {
-
+		
 			var temporalLegend = L.control({ position: "bottomleft" });
 
 			temporalLegend.onAdd = function(map) {
 					var output = L.DomUtil.create("output", "temporal-legend");
+					
 					$(output).text(startTimestamp)
+					
 					return output;
+					
 			}
 
 			temporalLegend.addTo(map);
+		
 		}
 
 
