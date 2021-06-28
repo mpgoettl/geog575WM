@@ -15,20 +15,19 @@ $(document).ready(function() {
 		});
 		
 		var basemaps = [
-			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png', {
+			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
 				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-				label: 'Watercolor',
-				iconURL: 'img/watercolor.jpg'
-			
+				label: 'Toner Lite',				// optional label used for tooltip
+				iconURL: 'img/tonerGray.png'
 			}),
 			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
 				label: 'Toner',
 				iconURL: 'img/tonerBlack.png'
 			}),
-			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
+			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png', {
 				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-				label: 'Toner Lite',				// optional label used for tooltip
-				iconURL: 'img/tonerGray.png'
+				label: 'Watercolor',
+				iconURL: 'img/watercolor.jpg'
 			})
 			
 		];
@@ -221,8 +220,9 @@ $(document).ready(function() {
 			
 			
 			
-			
-			
+			console.log(timestamps[timestamps.length-1]);
+			console.log(timestamps[0]);
+			console.log(String(timestamps[0]));
 			
 		
 			
@@ -233,12 +233,11 @@ $(document).ready(function() {
 						"min": timestamps[0],
 						"step": 1,
 						"value": String(timestamps[0])})
-						
-					.on("input change", function() {
+					.on("input", function() {
 						
 						updatePropSymbols($(this).val().toString());
 						var i = $.inArray(this.value,timestamps);
-						$(".temporal-legend").text(this.value);
+						$(".temporal-legend").text(this[i].value);
 			});
 			
 			return slider;
@@ -249,7 +248,6 @@ $(document).ready(function() {
 			
 			
 		}
-		
 		
 		function createTemporalLegend(startTimestamp) {
 		
