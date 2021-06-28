@@ -3,18 +3,19 @@
 html, body, #map {
     width: 100%;
     height: 100%;
-	margin: 15px auto;
+	margin: auto;
 }
 #map{
-    width: 95%; 
-    height: 95%;
-	margin: 20px auto;
+    width: 100%; 
+    height: 100%;
+	margin: auto;
 		
 
 
 }
 .range-slider {
     width: 250%;
+	
 	
 }
 .leaflet-popup-content {

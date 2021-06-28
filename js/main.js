@@ -14,20 +14,25 @@ $(document).ready(function() {
 				
 		});
 		
+		
+		
 		var basemaps = [
-			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
-				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-				label: 'Toner Lite',				// optional label used for tooltip
-				iconURL: 'img/tonerGray.png'
-			}),
 			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
 				label: 'Toner',
 				iconURL: 'img/tonerBlack.png'
 			}),
+			
 			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png', {
 				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 				label: 'Watercolor',
 				iconURL: 'img/watercolor.jpg'
+			
+			}),
+			
+			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
+				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+				label: 'Toner Lite',				// optional label used for tooltip
+				iconURL: 'img/tonerGray.png'
 			})
 			
 		];
@@ -40,15 +45,8 @@ $(document).ready(function() {
 		
 		var popup = L.popup();
 	
-				function onMapClick(e) {
-					popup
-						.setLatLng(e.latlng)
-						.setContent("This specific location on the map is " + e.latlng.toString())
-						.openOn(map);
-				}
-			map.on('click', onMapClick);
-			
-		$.getJSON("data/map.json",(function(data) {
+		
+		$.getJSON("data/map.json",(function(data) {  
 			var info = processData(data);
 			createPropSymbols(info.timestamps, data);
 			createLegend(info.min, info.max);
@@ -56,8 +54,8 @@ $(document).ready(function() {
 			
 		function processData(data) {
 			var timestamps = [];
-			var min = Infinity;
-			var max = -Infinity;
+			var min = 0; //Infinity;
+			var max = 20; //Infinity;
 			
 			for (var feature in data.features) {
 				
@@ -67,6 +65,8 @@ $(document).ready(function() {
 					
 					if (attribute != "id" &&
 						attribute != "name" &&
+						attribute != "pollution" &&
+						attribute != "trend" &&
 						attribute != "lat" &&
 						attribute != "lon" ) {
 								
@@ -91,6 +91,7 @@ $(document).ready(function() {
 				max : max
 			}
 		}
+		
 		function createPropSymbols(timestamps, data) {
 	
 				cities = L.geoJson(data, {
@@ -102,40 +103,46 @@ $(document).ready(function() {
 								color: "black",
 								weight: 1, 
 								fillOpacity: 0.6 
-							   }).on({
-								   
+							   })
+							   .on({
+								   						   
 								   mouseover: function(e) {
 											this.openPopup();
 											this.setStyle({color: "yellow"});
 									},
-								   mouseout: function(e) {
+								  mouseout: function(e) {
 											this.closePopup();
 											this.setStyle({color: "black"});
 									}
 									
 								});
 						}
-				}).addTo(map);
+						
 
+					
+				}).addTo(map);
+				
+				
 				updatePropSymbols(timestamps[0]);
 		}
 		function updatePropSymbols(timestamp) {
-
+			
 			cities.eachLayer(function(layer) {
 		
 				var props = layer.feature.properties;
 				var radius = calcPropRadius(props[timestamp]);
-				var popupContent = "<b>" + "Particulate Matter" + "</b><br><br>" + props.name + "<i>" + "</i>" + "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp;
-
+				var popupContent = "<b>"+"<a href=https://www.epa.gov/pm-pollution target=_blank> Particulate Matter</a>"
+				+ "</b><br><br>" + props.name + "<i>" + "</i>" + "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp;
+				
 				layer.setRadius(radius);
 				layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
 			});
 		}
 		function calcPropRadius(attributeValue) {
 
-			var scaleFactor = 16;
+			var scaleFactor = 30;
 			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI)*2;			
+			return Math.sqrt(area/Math.PI)*3;			
 		}
 		
 		
@@ -151,7 +158,7 @@ $(document).ready(function() {
 
 			function roundNumber(inNumber) {
 
-						return (Math.round(inNumber/10) * 10);
+						return (Math.round(inNumber/2) * 2);
 			}
 
 			var legend = L.control( { position: "bottomright" } );
@@ -170,7 +177,7 @@ $(document).ready(function() {
 				L.DomEvent.stopPropagation(e);
 			});
 
-			$(legendContainer).append("<h2 id='legendTitle'> PM 2.5</h2>");
+			$(legendContainer).append("<h2 id='legendTitle'> Particulate <br> Matter <br> in the Air</h2>");
 
 			
 			for (var i = 0; i <= classes.length-1; i++) {
@@ -213,26 +220,27 @@ $(document).ready(function() {
 			sliderControl.onAdd = function(map) {
 			
 			var slider = L.DomUtil.create("input", "range-slider");
-
+			
+			
 			 
 			L.DomEvent.addListener(slider, "mousedown", function(e) {
 			L.DomEvent.stopPropagation(e);
 			
 			});
 			 
-			
-
 			$(slider)
 					.attr({
 						"type":"range",
 						"max": timestamps[timestamps.length-1],
 						"min": timestamps[0],
-						"step": 11,
+						"step": 1,
 						"value": String(timestamps[0])})
+						
 					.on("input change", function() {
+						
 						updatePropSymbols($(this).val().toString());
 						var i = $.inArray(this.value,timestamps);
-						$(".temporal-legend").text(this[i].value);
+						$(".temporal-legend").text(this.value);
 			});
 			
 			return slider;
@@ -241,30 +249,35 @@ $(document).ready(function() {
 			sliderControl.addTo(map)
 			createTemporalLegend(timestamps[0]);
 			
+			
 		}
 		
+		
 		function createTemporalLegend(startTimestamp) {
-
+		
 			var temporalLegend = L.control({ position: "bottomleft" });
 
 			temporalLegend.onAdd = function(map) {
 					var output = L.DomUtil.create("output", "temporal-legend");
+					
 					$(output).text(startTimestamp)
+					
 					return output;
+					
 			}
 
 			temporalLegend.addTo(map);
+		
 		}
 
-
+		
 		
 		}));
 	});
-				
+	
 				
 		
-		
-
+	
 	
 
 	

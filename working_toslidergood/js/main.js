@@ -14,17 +14,21 @@ $(document).ready(function() {
 				
 		});
 		
+		
+		
 		var basemaps = [
+			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+				label: 'Toner',
+				iconURL: 'img/tonerBlack.png'
+			}),
+			
 			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png', {
 				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 				label: 'Watercolor',
 				iconURL: 'img/watercolor.jpg'
 			
 			}),
-			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
-				label: 'Toner',
-				iconURL: 'img/tonerBlack.png'
-			}),
+			
 			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
 				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 				label: 'Toner Lite',				// optional label used for tooltip
@@ -42,7 +46,7 @@ $(document).ready(function() {
 		var popup = L.popup();
 	
 		
-		$.getJSON("data/map.json",(function(data) {  //"https://raw.githubusercontent.com/neiugis/lab7_map/main/city.geojson"
+		$.getJSON("data/map.json",(function(data) {  
 			var info = processData(data);
 			createPropSymbols(info.timestamps, data);
 			createLegend(info.min, info.max);
@@ -87,6 +91,7 @@ $(document).ready(function() {
 				max : max
 			}
 		}
+		
 		function createPropSymbols(timestamps, data) {
 	
 				cities = L.geoJson(data, {
@@ -98,21 +103,26 @@ $(document).ready(function() {
 								color: "black",
 								weight: 1, 
 								fillOpacity: 0.6 
-							   }).on({
-								   
+							   })
+							   .on({
+								   						   
 								   mouseover: function(e) {
 											this.openPopup();
 											this.setStyle({color: "yellow"});
 									},
-								   mouseout: function(e) {
+								  mouseout: function(e) {
 											this.closePopup();
 											this.setStyle({color: "black"});
 									}
 									
 								});
 						}
-				}).addTo(map);
+						
 
+					
+				}).addTo(map);
+				
+				
 				updatePropSymbols(timestamps[0]);
 		}
 		function updatePropSymbols(timestamp) {
@@ -121,7 +131,8 @@ $(document).ready(function() {
 		
 				var props = layer.feature.properties;
 				var radius = calcPropRadius(props[timestamp]);
-				var popupContent = "<b>" + "Particulate Matter" + "</b><br><br>" + props.name + "<i>" + "</i>" + "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp;
+				var popupContent = "<b>"+"<a href=https://www.epa.gov/pm-pollution target=_blank> Particulate Matter</a>"
+				+ "</b><br><br>" + props.name + "<i>" + "</i>" + "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp;
 				
 				layer.setRadius(radius);
 				layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
@@ -217,15 +228,6 @@ $(document).ready(function() {
 			
 			});
 			 
-			
-			
-			
-			
-			
-			
-			
-		
-			
 			$(slider)
 					.attr({
 						"type":"range",
@@ -268,12 +270,11 @@ $(document).ready(function() {
 		
 		}
 
-
+		
 		
 		}));
 	});
 	
-				
 				
 		
 	
