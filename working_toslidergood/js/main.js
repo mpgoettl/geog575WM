@@ -120,7 +120,8 @@ $(document).ready(function() {
 				var props = layer.feature.properties;
 				var radius = calcPropRadius(props[timestamp]);
 				var popupContent = "<b>"+"<a href=https://www.epa.gov/pm-pollution target=_blank> Particulate Matter</a>"
-				+ "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp + "</b><br>" + props.name + "<i>" + "</i>";
+				+ "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp 
+				+ "</b><br>" + "Weighted Annual Mean" + "</b><br>" + props.name + "<i>" + "</i>";
 				
 				layer.setRadius(radius);
 				layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
