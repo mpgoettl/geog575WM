@@ -9,7 +9,13 @@ $(document).ready(function() {
 		center: mapCenter, // EDIT latitude, longitude to re-center map [39.34, -99.85],
 		zoom: 4,  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
 		scrollWheelZoom: true,
-		tap: false
+		tap: false,
+		fullscreenControl: true,
+		fullscreenControlOptions: {
+			position: 'topleft'
+		}
+		
+		
 		
 				
 		});
