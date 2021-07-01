@@ -13,6 +13,7 @@ $(document).ready(function() {
 		
 				
 		});
+		
 				
 		var basemaps = [
 			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
@@ -194,17 +195,26 @@ $(document).ready(function() {
 		} 
 				
 		function createSliderUI(timestamps) {
+			
+			
 
 			var sliderControl = L.control({ position: "bottomleft"});
 						
 			sliderControl.onAdd = function(map) {
 			
 			var slider = L.DomUtil.create("input", "range-slider");
-						 
-			L.DomEvent.addListener(slider, "mousedown", function(e) {
-			L.DomEvent.stopPropagation(e);
+			
+			$(slider).mousedown(function () {
+				map.dragging.disable();
 			});
-			 
+			$(document).mouseup(function () {
+            map.dragging.enable();
+			});
+			
+			L.DomEvent.addListener(slider, "click", function(e) {
+			L.DomEvent.stopPropagation(e); //map.dragging.disable();
+			});
+			
 			$(slider)
 					.attr({
 						"type":"range",
