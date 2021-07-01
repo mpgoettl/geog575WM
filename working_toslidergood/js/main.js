@@ -103,7 +103,7 @@ $(document).ready(function() {
 											this.setStyle({color: "yellow"});
 									},
 								   mouseout: function(e) {
-											//this.closePopup();
+											this.closePopup();
 											this.setStyle({color: "black"});
 									}
 									
@@ -119,7 +119,7 @@ $(document).ready(function() {
 		
 				var props = layer.feature.properties;
 				var radius = calcPropRadius(props[timestamp]);
-				var popupContent = "<b>"+"<a href=https://www.epa.gov/pm-pollution target=_blank> Particulate Matter</a>"
+				var popupContent = "<b>"+"PM 2.5 in the Air"
 				+ "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp 
 				+ "</b><br>" + "Weighted Annual Mean" + "</b><br>" + props.name + "<i>" + "</i>";
 				
