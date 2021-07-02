@@ -23,7 +23,7 @@ html, body, #map {
 .legend, .temporal-legend {
 	
 	padding: 6px 10px;
-	font: 14px/16px Arial, Helvetica, sans-serif;
+	font: 10px/12px Calibri, Calibri, sans-serif;
 	background: white;
 	background: rgba(255,255,255, 0.8);
 	box-shadow: 0 0 15px rgba(0,0,0,0.9);
@@ -36,7 +36,7 @@ html, body, #map {
 }
 .symbolsContainer {
 	float: left;
-	margin-left: 50px;
+	margin-left: 30px;
 }
 .legendCircle {
 	border-radius:50%; 

@@ -137,7 +137,7 @@ $(document).ready(function() {
 		
 		function calcPropRadius(attributeValue) {
 
-			var scaleFactor = 30;
+			var scaleFactor = 16;
 			var area = attributeValue * scaleFactor;
 			return Math.sqrt(area/Math.PI)*3;			
 		}		
