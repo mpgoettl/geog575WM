@@ -2,260 +2,153 @@
 
 $(document).ready(function() {
 		
-		var mapCenter = [41, -94];
-		var cities;
+		var HsSchools = new L.LayerGroup();
+		var SecSchools = new L.LayerGroup();
+		var ElSchools = new L.LayerGroup();
+		var CSchools = new L.LayerGroup();
+		var High_School = new L.LayerGroup();
+		var Secondary = new L.LayerGroup();
+		var Elementary = new L.LayerGroup();
+		
+		
+		var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        var osmAttrib='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        var osm = new L.TileLayer(osmUrl, {attribution: osmAttrib});
+				
+		var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
+			attribution: 'Map tiles by &copy <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
+  
+		  
+	    // display USGS_USImagery tiles with light features and labels
+	    var USGS_USImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', {
+			atrribution: 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'});
+	  
+	  
+	  	$.getJSON("data/HsSchools.json",function(data){
+		
+		// add GeoJSON layer to the map once the file is loaded
+		var datalayer = L.geoJson(data ,{
+		onEachFeature: function(feature, featureLayer) {
+		featureLayer.bindPopup(feature.properties.name);
+		}
+		}).addTo(HsSchools)    
+		});
+		$.getJSON("data/SecSchools.json",function(data){
+		
+		// add GeoJSON layer to the map once the file is loaded
+		var datalayer = L.geoJson(data ,{
+		onEachFeature: function(feature, featureLayer) {
+		featureLayer.bindPopup(feature.properties.name);
+		}
+		}).addTo(SecSchools)    
+		});
+		$.getJSON("data/ElSchools.json",function(data){
+		
+		// add GeoJSON layer to the map once the file is loaded
+		var datalayer = L.geoJson(data ,{
+		onEachFeature: function(feature, featureLayer) {
+		featureLayer.bindPopup(feature.properties.name);
+		}
+		}).addTo(ElSchools)    
+		});
+		$.getJSON("data/CSchools.json",function(data){
+		
+		// add GeoJSON layer to the map once the file is loaded
+		var datalayer = L.geoJson(data ,{
+		onEachFeature: function(feature, featureLayer) {
+		featureLayer.bindPopup(feature.properties.name);
+		}
+		}).addTo(CSchools)    
+		});
+		
+		$.getJSON("data/High_School.geojson",function(data1){
+		// add GeoJSON layer to the map once the file is loaded
+		var datalayer1 = L.geoJson(data1 ,{
+		style: {
+        color: "red", 
+        weight: 2, 
+        fillColor: "yellow", 
+        fillOpacity: 0.1
+		},	
+		onEachFeature: function(feature, featureLayer) {
+		featureLayer.bindPopup(feature.properties.name);
+		}
+		}).addTo(High_School)  
+		});
+		
+		$.getJSON("data/Secondary.geojson",function(data2){
+		
+		// add GeoJSON layer to the map once the file is loaded
+		var datalayer2 = L.geoJson(data2 ,{
+			style: {
+        color: "blue", 
+        weight: 2, 
+        fillColor: "yellow", 
+        fillOpacity: 0.1
+		},	
+		onEachFeature: function(feature, featureLayer) {
+		featureLayer.bindPopup(feature.properties.name);
+		}
+		}).addTo(Secondary) 
+		});
+		
+		$.getJSON("data/Elementary.geojson",function(data3){
+		
+		// add GeoJSON layer to the map once the file is loaded
+		var datalayer3 = L.geoJson(data3 ,{
+			style: {
+        color: "green", 
+        weight: 2, 
+        fillColor: "yellow", 
+        fillOpacity: 0.1
+		},	
+		onEachFeature: function(feature, featureLayer) {
+		featureLayer.bindPopup(feature.properties.name);
+		}
+		}).addTo(Elementary)    
+		});
+		
+		var mapCenter = [44.796013, -91.497962];
 		var map = L.map('map', {
 		defaultExtentControl: true,
 		center: mapCenter, // EDIT latitude, longitude to re-center map [39.34, -99.85],
-		zoom: 4,  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
+		zoom: 11,  // EDIT from 1 to 18 -- decrease to zoom out, increase to zoom in
+		layers: [osm,Stamen_TonerLite,USGS_USImagery, HsSchools,SecSchools,ElSchools,CSchools],
 		scrollWheelZoom: true,
 		tap: false,
 		fullscreenControl: true,
 		fullscreenControlOptions: {
 			position: 'topleft'
 		}
-		
-		
-		
-				
 		});
 		
-				
-		var basemaps = [
-			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
-				label: 'Toner',
-				iconURL: 'img/tonerBlack.png'
-			}),
-			
-			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png', {
-				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-				label: 'Watercolor',
-				iconURL: 'img/watercolor.jpg'
-			
-			}),
-			
-			L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
-				attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-				label: 'Toner Lite',				// optional label used for tooltip
-				iconURL: 'img/tonerGray.png'
-			})
-		];
+		var osmGeocoder = new L.Control.OSMGeocoder({placeholder: 'Search location...'});
 
-		map.addControl(L.control.basemaps({
+		map.addControl(osmGeocoder);
+		
+		var baseLayers = {
+		"USGS Imagery": USGS_USImagery,
+		"Stamen Toner Lite": Stamen_TonerLite,
+		"OpenStreet Map": osm,
+		};
+		
+		var overlays = {
+			"High Schools": HsSchools,
+			"Middle Schools": SecSchools,
+			"Elementary Schools": ElSchools,
+			"Charter Schools": CSchools,
+			"High School": High_School, 
+			"Middle": Secondary,
+			"Elementary": Elementary
+		};
+		
+		/* Control panel to display map layers */
+		 L.control.layers(baseLayers, overlays, {
 			position: "topright",
-			basemaps: basemaps,
-			
-		}));
-					
-		$.getJSON("data/map.json",(function(data) {  
-			var info = processData(data);
-			createPropSymbols(info.timestamps, data);
-			createLegend(info.min, info.max);
-			createSliderUI(info.timestamps);
-			
-		function processData(data) {
-			var timestamps = [];
-			var min = 0; //Infinity;
-			var max = 20; //Infinity;
-			
-			for (var feature in data.features) {
-				
-				var properties = data.features[feature].properties;
-				
-				for (var attribute in properties) {
-					
-					if (attribute != "id" &&
-						attribute != "name" &&
-						attribute != "pollution" &&
-						attribute != "trend" &&
-						attribute != "lat" &&
-						attribute != "lon" ) {
-								
-							if ( $.inArray(attribute,timestamps) === -1) {
-								timestamps.push(attribute);
-							}
-							if (properties[attribute] < min) {
-								min = properties[attribute];
-							}
-							if (properties[attribute] > max) {
-								max = properties[attribute];
-							}
-					}
-				}
-			}
-			
-			return {
-				timestamps : timestamps,
-				min : min,
-				max : max
-			}
-		}
-		
-		function createPropSymbols(timestamps, data) {
-	
-				cities = L.geoJson(data, {
-				
-						pointToLayer: function(feature, latlng) {
-							
-						return L.circleMarker(latlng, {
-								fillColor: "yellow",
-								color: "black",
-								weight: 1, 
-								fillOpacity: 0.6 
-							   })
-							   .on({
-								   						   
-								   mouseover: function(e) {
-											this.openPopup();
-											this.setStyle({color: "yellow"});
-									},
-								   mouseout: function(e) {
-											this.closePopup();
-											this.setStyle({color: "black"});
-									}
-									
-								});
-						}
-				}).addTo(map);
-				updatePropSymbols(timestamps[0]);
-		}
-		
-		function updatePropSymbols(timestamp) {
-			
-			cities.eachLayer(function(layer) {
-		
-				var props = layer.feature.properties;
-				var radius = calcPropRadius(props[timestamp]);
-				var popupContent = "<b>"+"PM 2.5 in the Air"
-				+ "</b><br>" + String(props[timestamp]) + " micrometers</b>" + "</i> in </i>" + timestamp 
-				+ "</b><br>" + "Weighted Annual Mean" + "</b><br>" + props.name + "<i>" + "</i>";
-				
-				layer.setRadius(radius);
-				layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
-			});
-		}
-		
-		function calcPropRadius(attributeValue) {
-
-			var scaleFactor = 16;
-			var area = attributeValue * scaleFactor;
-			return Math.sqrt(area/Math.PI)*3;			
-		}		
-		
-		function createLegend(min, max) {
-
-			if (min < 10) {
-				min = 10;
-			}
-
-			function roundNumber(inNumber) {
-
-						return (Math.round(inNumber/2) * 2);
-			}
-
-			var legend = L.control( { position: "bottomright" } );
-
-			legend.onAdd = function(map) {
-
-			var legendContainer = L.DomUtil.create("div", "legend");
-			var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
-			var classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)];
-			var legendCircle;
-			var lastRadius = 0;
-			var currentRadius;
-			var margin;
-
-			L.DomEvent.addListener(legendContainer, "mousedown", function(e) {
-				L.DomEvent.stopPropagation(e);
-			});
-
-			$(legendContainer).append("<h2 id='legendTitle'> Particulate <br> Matter <br> in the Air</h2>");
-			
-			for (var i = 0; i <= classes.length-1; i++) {
-
-				legendCircle = L.DomUtil.create("div", "legendCircle");
-
-				currentRadius = calcPropRadius(classes[i]);
-
-				margin = -currentRadius - lastRadius - 2;
-
-				$(legendCircle).attr("style", "width: " + currentRadius*2 +
-					"px; height: " + currentRadius*2 +
-					"px; margin-left: " + margin + "px" );
-				$(legendCircle).append("<span class='legendValue'>"+classes[i]+"</span>");
-
-				$(symbolsContainer).append(legendCircle);
-
-				lastRadius = currentRadius;
-
-			}
-		
-			$(legendContainer).append(symbolsContainer);
-
-			return legendContainer;
-
-			};
-
-			legend.addTo(map);
-
-		} 
-				
-		function createSliderUI(timestamps) {
-			
-			
-
-			var sliderControl = L.control({ position: "bottomleft"});
-						
-			sliderControl.onAdd = function(map) {
-			
-			var slider = L.DomUtil.create("input", "range-slider");
-			
-			$(slider).mousedown(function () {
-				map.dragging.disable();
-			});
-			$(document).mouseup(function () {
-            map.dragging.enable();
-			});
-			
-			L.DomEvent.addListener(slider, "click", function(e) {
-			L.DomEvent.stopPropagation(e); //map.dragging.disable();
-			});
-			
-			$(slider)
-					.attr({
-						"type":"range",
-						"max": timestamps[timestamps.length-1],
-						"min": timestamps[0],
-						"step": 1,
-						"value": String(timestamps[0])})
-					.on("input change", function() {
-						updatePropSymbols($(this).val().toString());
-						var i = $.inArray(this.value,timestamps);
-						$(".temporal-legend").text(this.value);
-			});
-			
-			return slider;
-			}
-
-			sliderControl.addTo(map)
-			createTemporalLegend(timestamps[0]);
-		}
-				
-		function createTemporalLegend(startTimestamp) {
-		
-			var temporalLegend = L.control({ position: "bottomleft" });
-
-			temporalLegend.onAdd = function(map) {
-					var output = L.DomUtil.create("output", "temporal-legend");
-					
-					$(output).text(startTimestamp)
-					
-					return output;
-			}
-			temporalLegend.addTo(map);
-		}
-		}));
-	});
+			collapsed: false
+		}).addTo(map);
+    	
+});
 	
 				
 		
